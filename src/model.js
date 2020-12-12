@@ -1003,7 +1003,7 @@ class Model {
     options = Utils.merge(_.cloneDeep(globalOptions.define), options);
 
     if (!options.modelName) {
-      options.modelName = this.name;
+      options.modelName = this.name; // lfp: 类名？ define() 中的 model
     }
 
     options = Utils.merge(
@@ -1021,7 +1021,7 @@ class Model {
 
     this.sequelize.runHooks('beforeDefine', attributes, options);
 
-    if (options.modelName !== this.name) {
+    if (options.modelName !== this.name) { // 类名（默认 model）不等于模型名（define 第一个参数），则使用模型名，并定义属性name，值为模型名
       Object.defineProperty(this, 'name', { value: options.modelName });
     }
     delete options.modelName;
@@ -1052,12 +1052,12 @@ class Model {
 
     this.underscored = this.options.underscored;
 
-    if (!this.options.tableName) {
-      this.tableName = this.options.freezeTableName
-        ? this.name
-        : Utils.underscoredIf(Utils.pluralize(this.name), this.underscored);
+    if (!this.options.tableName) { // lfp: 如何设置表名
+      this.tableName = this.options.freezeTableName 
+        ? this.name // 如果冻结表名（freezeTableName = true），则使用模型名
+        : Utils.underscoredIf(Utils.pluralize(this.name), this.underscored);  // 如果使用下划线（underscored = true）,则将模型名表示下划线格式
     } else {
-      this.tableName = this.options.tableName;
+      this.tableName = this.options.tableName;  // 如果添加了 tableName 配置项，则以 tableName 为主
     }
 
     this._schema = this.options.schema;
