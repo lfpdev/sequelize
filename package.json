@@ -74,7 +74,7 @@
     "mariadb": "2.2.0",
     "markdownlint-cli": "^0.18.0",
     "mocha": "^6.1.4",
-    "mysql2": "^1.6.5",
+    "mysql2": "^2.1.0",
     "nyc": "^14.1.1",
     "p-timeout": "^4.0.0",
     "pg": "^7.8.1",
@@ -109,12 +109,6 @@
   },
   "lint-staged": {
     "*.js": "eslint"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   },
   "release": {
     "branch": "v5",
