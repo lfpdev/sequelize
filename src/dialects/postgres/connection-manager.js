@@ -15,7 +15,7 @@ class ConnectionManager extends AbstractConnectionManager {
     sequelize.config.port = sequelize.config.port || 5432;
     super(dialect, sequelize);
 
-    const pgLib = this._loadDialectModule('pg');
+    const pgLib = this._loadDialectModule('pg'); // 建立与 pg （pg client）的连接
     this.lib = this.sequelize.config.native ? pgLib.native : pgLib;
 
     this._clearDynamicOIDs();

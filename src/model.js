@@ -1039,7 +1039,7 @@ class Model {
     }
 
 
-    this.rawAttributes = _.mapValues(attributes, (attribute, name) => {
+    this.rawAttributes = _.mapValues(attributes, (attribute, name) => { // NOTE 调用 init 方法，完成 rawAttributes 赋值。如果字段格式与数据库不同，returning 中以数据库格式为准
       attribute = this.sequelize.normalizeAttribute(attribute);
 
       if (attribute.type === undefined) {
@@ -2260,7 +2260,7 @@ class Model {
    * @returns {Promise<Model>}
    *
    */
-  static async create(values, options) {
+  static async create(values, options) { // NOTE build一个Model instance
     options = Utils.cloneDeep(options || {});
 
     return await this.build(values, {
@@ -2612,7 +2612,7 @@ class Model {
       }
     }
 
-    const instances = records.map(values => this.build(values, { isNewRecord: true, include: options.include }));
+    const instances = records.map(values => this.build(values, { isNewRecord: true, include: options.include })); // NOTE build model instance
 
     const recursiveBulkCreate = async (instances, options) => {
       options = {
@@ -2667,7 +2667,7 @@ class Model {
 
         await Promise.all(instances.map(async instance => {
           try {
-            await instance.validate(validateOptions);
+            await instance.validate(validateOptions); // 调用的是 model 的 validate。与走 create=>build=>save=>validate是同一个方法。因此 bulkCreate emit afterValidate hook 需要额外传入 {validate: true}
           } catch (err) {
             errors.push(new sequelizeErrors.BulkRecordError(err, instance));
           }
@@ -2678,11 +2678,11 @@ class Model {
           throw new sequelizeErrors.AggregateError(errors);
         }
       }
-      if (options.individualHooks) {
+      if (options.individualHooks) { // 独立并发执行，多条sql语句
         await Promise.all(instances.map(async instance => {
           const individualOptions = {
             ...options,
-            validate: false,
+            validate: false, // NOTE bulkCreate 与 create 最终都调用 save 方法，但是bulkCreate的validate给了false，不会触发 afterValidate hook。
             hooks: true
           };
           delete individualOptions.fields;
@@ -2691,7 +2691,7 @@ class Model {
 
           await instance.save(individualOptions);
         }));
-      } else {
+      } else { // 一条sql语句
         if (options.include && options.include.length) {
           await Promise.all(options.include.filter(include => include.association instanceof BelongsTo).map(async include => {
             const associationInstances = [];
@@ -2782,7 +2782,7 @@ class Model {
         }
 
         // Map returning attributes to fields
-        if (options.returning && Array.isArray(options.returning)) {
+        if (options.returning && Array.isArray(options.returning)) { // NOTE bulkCreate returning
           options.returning = options.returning.map(attr => _.get(model.rawAttributes[attr], 'field', attr));
         }
 
@@ -3905,7 +3905,7 @@ class Model {
     options = Utils.cloneDeep(options);
     options = _.defaults(options, {
       hooks: true,
-      validate: true
+      validate: true // 给默认值 true。但是 bulkCreate 传入为false。create默认为true
     });
 
     if (!options.fields) {

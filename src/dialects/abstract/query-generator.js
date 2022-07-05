@@ -1169,7 +1169,7 @@ class QueryGenerator {
     const limit = options.limit;
     const mainQueryItems = [];
     const subQueryItems = [];
-    const subQuery = options.subQuery === undefined ? limit && options.hasMultiAssociation : options.subQuery;
+    const subQuery = options.subQuery === undefined ? limit && options.hasMultiAssociation : options.subQuery; // NOTE: where 中使用 limit 时会导致子查询，设置 subQuery: false
     const attributes = {
       main: options.attributes && options.attributes.slice(),
       subQuery: null
